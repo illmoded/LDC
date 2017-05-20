@@ -153,17 +153,11 @@ void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MY
   // ev->number = event_info->eventNumber();
   ev->lumiblock = event_info->lumiBlock();
 
-  hmult->Fill(multipl);
 
   if (multipl > my_mult) //mozna od 0, ale po co
   {
     for (int i = 0; i < multipl; i++) //dla wszystkich sladow:
     {
-      if (tracks->at(i)->vertex())
-      {
-        hzsin->Fill(sinztheta(tracks->at(i)), multipl);
-        hd0->Fill(tracks->at(i)->d0(), tracks->at(i)->vz());
-      }
       if (event_sel2(tracks->at(i)))
       {
         c_mult++;
@@ -195,10 +189,16 @@ void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MY
       {
         if (event_sel2(tracks->at(i)))
         {
+          if (tracks->at(i)->vertex())
+          {
+            hzsin->Fill(sinztheta(tracks->at(i)));
+            hd0->Fill(tracks->at(i)->d0());
+          }
+
           double vertex_pos_z = (double)tracks->at(i)->vertex()->z();
           // Info("%f\n", vertex_pos_z);
           ev->vertex_pos = vertex_pos_z;
-          // hvertposz->Fill(vertex_pos_z);
+          hvertposz->Fill(vertex_pos_z);
 
           double phii = tracks->at(i)->phi();
           double etai = tracks->at(i)->eta();
@@ -440,15 +440,23 @@ EL::StatusCode LDCAna::histInitialize()
   hmult2 = new TH1F("hmult2", "", 50, 1, -1);
 
   heta = new TH1F("heta", "", 50, 1, -1);
+  heta_pre = new TH1F("heta_pre", "", 50, 1, -1);
+
   hdeta = new TH1F("hdeta", "", 50, 1, -1);
+
   hphi = new TH1F("hphi", "", 50, 1, -1);
-  hpt = new TH1F("hpt", "", 50, 1, -1);
   hdphi = new TH1F("hdphi", "", 50, 1, -1);
 
-  htrials = new TH1F("htrials", "", 20, 1, -1);
+  hpt = new TH1F("hpt", "", 50, 1, -1);
+  hpt_pre = new TH1F("hpt_pre", "", 50, 1, -1);
 
-  hzsin = new TH2F("zsin", "cut;zsin;mult", 50, 0, 1.5, 50, 60, 220);
-  hd0 = new TH2F("d0vz", ";d0;vz", 50, -1, 1, 50, -70, 70);
+  htrials = new TH1F("htrials", "", 20, 1, -1);
+  hnvtx = new TH1F("hnvtx", "", 20, 1, -1);
+
+  hzsin = new TH1F("zsin","", 50, 1, -1);
+  hd0 = new TH1F("d0vz","", 50, 1, -1);
+  hzsin_pre = new TH1F("zsin_pre","", 50, 1, -1);
+  hd0_pre = new TH1F("d0_pre","", 50, 1, -1);
 
   hcorrlin1 = new TH1F("hcorrlin1", "", 50, 0, TMath::Pi());
   hcorrlin2 = new TH1F("hcorrlin2", "", 50, 0, TMath::Pi());
@@ -458,7 +466,9 @@ EL::StatusCode LDCAna::histInitialize()
   // htrig = new TH1F();
   // wk()->addOutput(htrig);
 
-  // hvertposz = new TH1F("hvertposz","",50,1,-1);
+  hvertposz = new TH1F("hvertposz","",50,1,-1);
+  hvertposz_pre = new TH1F("hvertposz_pre","",50,1,-1);
+
 
   //  std::vector<MYEvent*> myevents; //!
 
@@ -483,15 +493,25 @@ EL::StatusCode LDCAna::histInitialize()
   wk()->addOutput(hmult2);
 
   wk()->addOutput(heta);
+    wk()->addOutput(heta_pre);
+
   wk()->addOutput(hdeta);
   wk()->addOutput(hphi);
   wk()->addOutput(hpt);
+    wk()->addOutput(hpt_pre);
+
   wk()->addOutput(hdphi);
   wk()->addOutput(htrials);
+  wk()->addOutput(hnvtx);
 
-  // wk()->addOutput(hvertposz);
+  
+
+  wk()->addOutput(hvertposz);
+  wk()->addOutput(hvertposz_pre);
   wk()->addOutput(hzsin);
   wk()->addOutput(hd0);
+    wk()->addOutput(hzsin_pre);
+  wk()->addOutput(hd0_pre);
 
   wk()->addOutput(hcorrlin1);
   wk()->addOutput(hcorrlin2);
@@ -581,8 +601,8 @@ EL::StatusCode LDCAna::execute()
   int multipl = 0;
 
   const int my_mult_low = 3;
-  const int my_mult = 60;
-  const int my_mult_high = 80;
+  const int my_mult = 150;
+  const int my_mult_high = 200;
 
   // auto trigger1 = trigDecTool->getChainGroup("HLT_mb_sp900_trk50_hmt_L1TE5");
 
@@ -590,10 +610,28 @@ EL::StatusCode LDCAna::execute()
   // if ( event->retrieve(tracks, "InDetTrackParticles").isSuccess())
   if (event->retrieve(tracks, "InDetTrackParticles").isSuccess() && event->retrieve(afpTrackContainer, "AFPTrackContainer").isSuccess())
   {
+      multipl = tracks->size();
+
+      // wypelnianie histogramow przed cieciami
+       hmult->Fill(multipl);
+       for (int i = 0; i < multipl - 1; i++)  
+       {
+         if (tracks->at(i)->vertex())
+         {
+            hvertposz_pre->Fill(tracks->at(i)->vertex()->z());
+            hzsin_pre->Fill(sinztheta(tracks->at(i)));
+         }
+         hd0_pre->Fill(tracks->at(i)->d0());
+         hpt_pre->Fill(tracks->at(i)->pt());
+         heta_pre->Fill(tracks->at(i)->eta());
+       }
+
+
+    //std::cout << afpTrackContainer->size() << std::endl;
     if (afpTrackContainer->size() == 1)
     {
-      multipl = tracks->size();
-      if (multipl > my_mult && multipl < my_mult_high)
+      // std::cout << multipl << std::endl;
+      if (multipl > my_mult && multipl < my_mult_high) 
       {
         llicznik(tracks, &myevents, hcorr, my_mult, event_info);
       }

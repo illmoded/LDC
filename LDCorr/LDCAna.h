@@ -49,15 +49,20 @@ class LDCAna : public EL::Algorithm
 	TH1 *hmult2; //!
 
 	TH1 *heta;  //!
+	TH1 *heta_pre;  //!
 	TH1 *hdeta; //!
 	TH1 *hphi;  //!
 	TH1 *hdphi; //!
 	TH1 *hpt;   //!
+	TH1 *hpt_pre;   //!
 
 	TH1 *htrials; //!
+	TH1 *hnvtx; //!
 
-	TH2 *hzsin; //!
-	TH2 *hd0;   //!
+	TH1 *hzsin; //!
+	TH1 *hd0;   //!
+	TH1 *hzsin_pre; //!
+	TH1 *hd0_pre;   //!
 
 	TH1 *hcorrlin1; //!
 	TH1 *hcorrlin2; //!
@@ -65,7 +70,8 @@ class LDCAna : public EL::Algorithm
 
 	TH1 *htrig; //!
 
-	// TH1* hvertposz; //!
+	TH1* hvertposz; //!
+	TH1* hvertposz_pre; //!
 
 	int ev_iter;						//!
 	MYEvent *ev;						//!

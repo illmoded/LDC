@@ -90,7 +90,7 @@ bool event_sel2(const xAOD::TrackParticle* tp)
     &&
     sinztheta(tp) < 1.5
     &&
-    tp->eta() < 2.5
+    fabs(tp->eta()) < 2.5
   )
   return true;
   else return false;
