@@ -30,8 +30,8 @@ void Run(const std::string &submitDir)
   //  const char* inputFilePath = gSystem->ExpandPathName ("/afs/cern.ch/work/k/kciesla/public/run310216_skimmed_mbts");
   //    // const char* inputFilePath = gSystem->ExpandPathName ("/afs/cern.ch/work/p/pbuglewi/public/data1/data16_13TeV");
 
-  // const char* inputFilePath = gSystem->ExpandPathName("/eos/user/r/rafal/AFP/user.rafal.00310216.r8600.TrigSkim.HLT_mb_sp900_trk50_hmt_L1TE5.v01_skimmed.root");
-  const char *inputFilePath = gSystem->ExpandPathName("/eos/user/r/rafal/AFP/user.rafal.00310216.r9017.TrigSkim.HLT_mb_sptrk_trk80_L1AFP_C_AND.v01_skimmed.root");
+  const char* inputFilePath = gSystem->ExpandPathName("/eos/user/r/rafal/AFP/user.rafal.00310216.r8600.TrigSkim.HLT_mb_sp900_trk50_hmt_L1TE5.v01_skimmed.root");
+  // const char *inputFilePath = gSystem->ExpandPathName("/eos/user/r/rafal/AFP/user.rafal.00310216.r9017.TrigSkim.HLT_mb_sptrk_trk80_L1AFP_C_AND.v01_skimmed.root");
 
   SH::ScanDir()
       // // //    // //.filePattern("user.sczekier.10576193._00000*")
@@ -76,7 +76,7 @@ void Run(const std::string &submitDir)
   // job.options()->setDouble (EL::Job::optFilesPerWorker, 5);
 
   // job.options()->setDouble (EL::Job::optSkipEvents, 3000000); //skip to
-  // job.options()->setDouble (EL::Job::optMaxEvents, 2000000); //max
+  // job.options()->setDouble (EL::Job::optMaxEvents, 200000); //max
 
   // make the driver we want to use:
   // this one works by running the algorithm directly:

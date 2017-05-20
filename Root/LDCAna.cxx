@@ -47,8 +47,6 @@ ClassImp(LDCAna)
 
   multipl = tracks->size();
   ev->multipl = multipl;
-
-  // ev->number = event_info->eventNumber();
   ev->lumiblock = event_info->lumiBlock();
 
   // hmult->Fill(multipl);
@@ -57,31 +55,21 @@ ClassImp(LDCAna)
   {
     for (int i = 0; i < multipl; i++) //dla wszystkich sladow:
     {
-      // if (tracks->at(i)->vertex())
-      // {
-      //   hzsin->Fill(sinztheta(tracks->at(i)),multipl);
-      //   hd0->Fill(tracks->at(i)->d0(),tracks->at(i)->vz());
-      // }
       if (event_sel2(tracks->at(i)))
       {
         c_mult++;
-        // Info("execute","track %d passed, curr c_mult = %d", i, c_mult);
       }
     }
 
     if (c_mult >= my_mult)
     {
-      // hmult2->Fill(multipl);
-      // Info("llicznik()","Event passed with mult: %d >= %d", c_mult, my_mult);
 
       for (int i = 0; i < multipl - 1; i++) //dla wszystkich sladow:
       {
         if (event_sel2(tracks->at(i)))
         {
           double vertex_pos_z = (double)tracks->at(i)->vertex()->z();
-          // Info("%f\n", vertex_pos_z);
           ev->vertex_pos = vertex_pos_z;
-          // hvertposz->Fill(vertex_pos_z);
 
           double phii = tracks->at(i)->phi();
           double etai = tracks->at(i)->eta();
@@ -109,16 +97,6 @@ ClassImp(LDCAna)
             double dphi = TMath::Min(2 * TMath::Pi() - fabs(phii - phij), fabs(phii - phij));
             double deta = etai - etaj;
 
-            // hphi12l->Fill(phii,phij);
-            // heta12l->Fill(etai,etaj);
-            //
-            // hdeta->Fill(deta);
-            // hdphi->Fill(dphi);
-
-            // if (fabs(deta > 2)) {
-            //   hcorrlin1->Fill(dphi);
-            // }
-
             hcorr->Fill(deta, dphi);
           }
 
@@ -141,7 +119,7 @@ ClassImp(LDCAna)
   }
 }
 
-void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MYEvent *> *myevents, TH2F *hcorr, int my_mult, const xAOD::EventInfo *event_info)
+void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MYEvent *> *myevents, TH2F *hcorr, int my_mult, int my_mult_high, const xAOD::EventInfo *event_info)
 {
   int multipl = 0;
   int c_mult = 0;
@@ -150,7 +128,6 @@ void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MY
 
   multipl = tracks->size();
   ev->multipl = multipl;
-  // ev->number = event_info->eventNumber();
   ev->lumiblock = event_info->lumiBlock();
 
 
@@ -161,13 +138,13 @@ void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MY
       if (event_sel2(tracks->at(i)))
       {
         c_mult++;
-        // Info("execute","track %d passed, curr c_mult = %d", i, c_mult);
       }
     }
 
-    if (c_mult >= my_mult)
+    if (c_mult >= my_mult && c_mult <= my_mult_high)
     {
-      hmult2->Fill(multipl);
+      hmult2->Fill(c_mult);
+      hmult3->Fill(multipl);
       // Info("llicznik()","Event passed with mult: %d >= %d", c_mult, my_mult);
 
       /// ############################ TRIGGERS
@@ -196,7 +173,6 @@ void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MY
           }
 
           double vertex_pos_z = (double)tracks->at(i)->vertex()->z();
-          // Info("%f\n", vertex_pos_z);
           ev->vertex_pos = vertex_pos_z;
           hvertposz->Fill(vertex_pos_z);
 
@@ -216,9 +192,7 @@ void LDCAna::llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MY
           for (int j = 0; j < multipl; j++)
           {
             if (i == j)
-            {
               continue;
-            }
             if (!event_sel2(tracks->at(j)))
               continue;
 
@@ -436,8 +410,9 @@ EL::StatusCode LDCAna::histInitialize()
   // hcorr3 = new TH2F("c","c;deta;dphi",nbin,-6,6,nbin,-1,4);
   // hcorr3n = new TH2F("cn","c_norm;deta;dphi",nbin,-6,6,nbin,-1,4);
 
-  hmult = new TH1F("hmult", "", 50, 1, -1);
-  hmult2 = new TH1F("hmult2", "", 50, 1, -1);
+  hmult = new TH1F("hmult", "", 50, 50, 150);
+  hmult2 = new TH1F("hmult2", "", 50, 50, 150);
+  hmult3 = new TH1F("hmult3", "", 50, 50, 150);
 
   heta = new TH1F("heta", "", 50, 1, -1);
   heta_pre = new TH1F("heta_pre", "", 50, 1, -1);
@@ -447,14 +422,14 @@ EL::StatusCode LDCAna::histInitialize()
   hphi = new TH1F("hphi", "", 50, 1, -1);
   hdphi = new TH1F("hdphi", "", 50, 1, -1);
 
-  hpt = new TH1F("hpt", "", 50, 1, -1);
-  hpt_pre = new TH1F("hpt_pre", "", 50, 1, -1);
+  hpt = new TH1F("hpt", "", 50, 0, 6000);
+  hpt_pre = new TH1F("hpt_pre", "", 50, 0, 6000);
 
   htrials = new TH1F("htrials", "", 20, 1, -1);
-  hnvtx = new TH1F("hnvtx", "", 20, 1, -1);
+  // hnvtx = new TH1F("hnvtx", "", 20, 1, -1);
 
   hzsin = new TH1F("zsin","", 50, 1, -1);
-  hd0 = new TH1F("d0vz","", 50, 1, -1);
+  hd0 = new TH1F("d0","", 50, 1, -1);
   hzsin_pre = new TH1F("zsin_pre","", 50, 1, -1);
   hd0_pre = new TH1F("d0_pre","", 50, 1, -1);
 
@@ -491,6 +466,7 @@ EL::StatusCode LDCAna::histInitialize()
 
   wk()->addOutput(hmult);
   wk()->addOutput(hmult2);
+  wk()->addOutput(hmult3);
 
   wk()->addOutput(heta);
     wk()->addOutput(heta_pre);
@@ -502,7 +478,7 @@ EL::StatusCode LDCAna::histInitialize()
 
   wk()->addOutput(hdphi);
   wk()->addOutput(htrials);
-  wk()->addOutput(hnvtx);
+  // wk()->addOutput(hnvtx);
 
   
 
@@ -592,7 +568,7 @@ EL::StatusCode LDCAna::execute()
   const xAOD::EventInfo *event_info = 0;
 
   // AFP
-  const xAOD::AFPTrackContainer *afpTrackContainer = 0;
+  // const xAOD::AFPTrackContainer *afpTrackContainer = 0;
 
   ANA_CHECK(event->retrieve(event_info, "EventInfo")); //te same lumiblocki
 
@@ -600,15 +576,15 @@ EL::StatusCode LDCAna::execute()
 
   int multipl = 0;
 
-  const int my_mult_low = 3;
-  const int my_mult = 150;
-  const int my_mult_high = 200;
+  // const int my_mult_low = 3;
+  const int my_mult = 50;
+  const int my_mult_high = 80;
 
   // auto trigger1 = trigDecTool->getChainGroup("HLT_mb_sp900_trk50_hmt_L1TE5");
 
   // if ( event->retrieve(tracks, "InDetTrackParticles").isSuccess() && trigger1->isPassed() )
-  // if ( event->retrieve(tracks, "InDetTrackParticles").isSuccess())
-  if (event->retrieve(tracks, "InDetTrackParticles").isSuccess() && event->retrieve(afpTrackContainer, "AFPTrackContainer").isSuccess())
+  if ( event->retrieve(tracks, "InDetTrackParticles").isSuccess())
+  // if (event->retrieve(tracks, "InDetTrackParticles").isSuccess() && event->retrieve(afpTrackContainer, "AFPTrackContainer").isSuccess())
   {
       multipl = tracks->size();
 
@@ -625,21 +601,20 @@ EL::StatusCode LDCAna::execute()
          hpt_pre->Fill(tracks->at(i)->pt());
          heta_pre->Fill(tracks->at(i)->eta());
        }
+      ///
 
-
-    //std::cout << afpTrackContainer->size() << std::endl;
-    if (afpTrackContainer->size() == 1)
-    {
-      // std::cout << multipl << std::endl;
-      if (multipl > my_mult && multipl < my_mult_high) 
+    // if (afpTrackContainer->size() == 1)
+    // {
+      
+      if (multipl > my_mult) 
       {
-        llicznik(tracks, &myevents, hcorr, my_mult, event_info);
+        llicznik(tracks, &myevents, hcorr, my_mult, my_mult_high, event_info);
       }
-      else if (my_mult_low < multipl && multipl < my_mult)
-      {
-        llicznik_nf(tracks, &myevents_lm, hcorr_lm, my_mult_low, event_info);
-      }
-    }
+      // else if (my_mult_low < multipl && multipl < my_mult)
+      // {
+      //   llicznik_nf(tracks, &myevents_lm, hcorr_lm, my_mult_low, event_info);
+      // }
+    // }
   }
 
   return EL::StatusCode::SUCCESS;

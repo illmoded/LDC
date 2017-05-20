@@ -25,7 +25,7 @@ class LDCAna : public EL::Algorithm
 	// TH1 *myHist; //!
 
 	void llicznik_nf(const xAOD::TrackParticleContainer *tracks, std::vector<MYEvent *> *myevents, TH2F *hcorr, int my_mult, const xAOD::EventInfo *event_info);
-	void llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MYEvent *> *myevents, TH2F *hcorr, int my_mult, const xAOD::EventInfo *event_info);
+	void llicznik(const xAOD::TrackParticleContainer *tracks, std::vector<MYEvent *> *myevents, TH2F *hcorr, int my_mult, int my_mult_high, const xAOD::EventInfo *event_info);
 	void lmianownik(std::vector<MYEvent *> myevents, TH2F *hcorr2);
 
 	TH2F *hcorr;  //!
@@ -47,6 +47,7 @@ class LDCAna : public EL::Algorithm
 
 	TH1 *hmult;  //!
 	TH1 *hmult2; //!
+	TH1 *hmult3; //!
 
 	TH1 *heta;  //!
 	TH1 *heta_pre;  //!

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "istream": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "limits": "cpp"
     }
 }
