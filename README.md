@@ -1,0 +1,2 @@
+# LDC
+Master thesis, WIP
